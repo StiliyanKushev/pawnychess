@@ -4,6 +4,11 @@ services:
     image: postgres
     restart: always
     ports:
-      - '5432:5432'
-    env_file:
-      - .env
+      - '${POSTGRES_PORT}:5432'
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+  redis:
+    image: redis
+    restart: always
+    ports:
+      - '${REDIS_PORT}:6379'

@@ -1,9 +1,13 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
-import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class UsersService {
@@ -12,12 +16,40 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto) {
-    const entity = this.usersRepository.create(createUserDto);
-    return await this.usersRepository.save(entity);
+    try {
+      const entity = this.usersRepository.create(createUserDto);
+      return await this.usersRepository.save(entity);
+    } catch (err) {
+      const pgUniqueViolationErrorCode = '23505';
+      if (err.code == pgUniqueViolationErrorCode) {
+        throw new ConflictException();
+      }
+      throw err;
+    }
   }
 
-  findOne(id: number) {
-    return this.usersRepository.findOneBy({ id });
+  async findOne(id: number) {
+    try {
+      return await this.usersRepository.findOneByOrFail({ id });
+    } catch {
+      throw new NotFoundException();
+    }
+  }
+
+  async findOneByEmail(email: string): Promise<User> {
+    try {
+      return await this.usersRepository.findOneByOrFail({ email });
+    } catch {
+      throw new NotFoundException();
+    }
+  }
+
+  async hasOne(id: number) {
+    return await this.usersRepository.existsBy({ id });
+  }
+
+  async hasOneByEmail(email: string) {
+    return await this.usersRepository.existsBy({ email });
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
