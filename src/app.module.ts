@@ -14,11 +14,10 @@ import { UsersModule } from './users/users.module';
     IamModule,
   ],
   providers: [
-    AppService,
+    /**
+     * register transforming validation pipe globally
+     */
     {
-      /**
-       * register transforming validation pipe globally
-       */
       provide: APP_PIPE,
       useValue: new ValidationPipe({
         transform: true,
@@ -27,6 +26,7 @@ import { UsersModule } from './users/users.module';
         whitelist: true,
       }),
     },
+    AppService,
   ],
 })
 export class AppModule {}
