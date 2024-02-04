@@ -52,10 +52,6 @@ export class AuthenticationService {
   async signIn(signInDto: SignInDto) {
     const user = await this.usersService.findOneByEmail(signInDto.email);
 
-    if (!user) {
-      throw new UnauthorizedException('User does not exist');
-    }
-
     const isEqual = await this.hashingService.compare(
       signInDto.password,
       user.password,
@@ -122,6 +118,7 @@ export class AuthenticationService {
       if (err instanceof InvalidatedRefreshTokenError) {
         throw new UnauthorizedException('Access denied');
       }
+      console.log(err);
       throw new UnauthorizedException();
     }
   }
