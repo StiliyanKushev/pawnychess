@@ -1,5 +1,6 @@
-import { Module } from '@nestjs/common';
+import { Module, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { APP_PIPE } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseModule } from './database/database.module';
@@ -14,6 +15,20 @@ import { UsersModule } from './users/users.module';
     IamModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      /**
+       * register transforming validation pipe globally
+       */
+      provide: APP_PIPE,
+      useValue: new ValidationPipe({
+        transform: true,
+        forbidUnknownValues: true,
+        forbidNonWhitelisted: true,
+        whitelist: true,
+      }),
+    },
+  ],
 })
 export class AppModule {}
