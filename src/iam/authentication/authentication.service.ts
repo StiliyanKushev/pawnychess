@@ -118,7 +118,6 @@ export class AuthenticationService {
       if (err instanceof InvalidatedRefreshTokenError) {
         throw new UnauthorizedException('Access denied');
       }
-      console.log(err);
       throw new UnauthorizedException();
     }
   }
