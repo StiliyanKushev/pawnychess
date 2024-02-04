@@ -56,7 +56,7 @@ export class UsersService {
     const entity = await this.usersRepository.preload({ id, ...updateUserDto });
 
     if (!entity) {
-      return new NotFoundException('cannot update, user does not exist');
+      throw new NotFoundException('cannot update, user does not exist');
     }
 
     return this.usersRepository.update({ id }, entity);
