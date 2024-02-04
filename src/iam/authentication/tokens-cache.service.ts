@@ -2,9 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { RedisService } from 'redis/redis.service';
 
 export class InvalidatedRefreshTokenError extends Error {}
-export class InvalidatedAccessTokenError extends Error {}
 
-// todo: document a bit what this does
+/**
+ * This service interacts with a redis client and caches
+ * refresh tokens such that it is able to validate/invalidate
+ * then.
+ */
 @Injectable()
 export class TokensCacheService {
   constructor(private readonly redisService: RedisService) {}
