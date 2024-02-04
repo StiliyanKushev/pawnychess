@@ -8,7 +8,6 @@ import {
 import { ConfigType } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-import { TokensCacheService } from 'iam/authentication/tokens-cache.service';
 import jwtConfig from 'iam/config/jwt.config';
 import { IAccessTokenPayload } from 'iam/interfaces/access-token-payload.interface';
 import { UsersService } from 'users/users.service';
@@ -41,7 +40,6 @@ export class AccessTokenGuard implements CanActivate {
   constructor(
     private readonly userService: UsersService,
     private readonly jwtService: JwtService,
-    private readonly tokensCache: TokensCacheService,
     @Inject(jwtConfig.KEY)
     private readonly jwtConfiguration: ConfigType<typeof jwtConfig>,
   ) {}
@@ -60,7 +58,7 @@ export class AccessTokenGuard implements CanActivate {
       );
 
       // verify that the user actually exists
-      if (!this.userService.hasOne(payload.sub)) {
+      if (!(await this.userService.hasOne(payload.sub))) {
         throw new UnauthorizedException();
       }
       req.accessToken = payload;
