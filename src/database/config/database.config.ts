@@ -1,4 +1,5 @@
 import { registerAs } from '@nestjs/config';
+import Joi from 'joi';
 
 export default registerAs('database', () => {
   return {
@@ -10,3 +11,11 @@ export default registerAs('database', () => {
     development: process.env.ENVIRONMENT?.toLowerCase() == 'development',
   };
 });
+
+export const databaseConfigSchema = {
+  POSTGRES_HOST: Joi.string().required(),
+  POSTGRES_PORT: Joi.string().pattern(/^\d+$/),
+  POSTGRES_USERNAME: Joi.string().required(),
+  POSTGRES_PASSWORD: Joi.string().required(),
+  POSTGRES_DATABASE: Joi.string().required(),
+};

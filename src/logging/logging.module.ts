@@ -2,8 +2,12 @@ import { DynamicModule, Module } from '@nestjs/common';
 import { ConfigModule, ConfigType } from '@nestjs/config';
 import { LoggerModule } from 'nestjs-pino';
 import loggingConfig from './config/logging.config';
+import { LoggingService } from './logging.service';
 
-@Module({})
+@Module({
+  providers: [LoggingService],
+  exports: [LoggingService],
+})
 export class LoggingModule {
   static forRoot(): DynamicModule {
     return {

@@ -1,11 +1,15 @@
 import { NestFactory } from '@nestjs/core';
-import { Logger, LoggerErrorInterceptor } from 'nestjs-pino';
+import { LoggingService } from 'logging/logging.service';
+import { SwaggerSetupService } from 'swagger-setup/swagger-setup.service';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
-  app.useLogger(app.get(Logger));
-  app.useGlobalInterceptors(new LoggerErrorInterceptor());
+
+  // setup additional configurations required by core modules
+  app.get(LoggingService).setup(app);
+  app.get(SwaggerSetupService).setup(app);
+
   await app.listen(3000);
 }
 bootstrap();
