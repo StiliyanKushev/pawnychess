@@ -1,6 +1,7 @@
 import { Module, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_PIPE } from '@nestjs/core';
+import { RedisModule } from 'redis/redis.module';
 import { AppService } from './app.service';
 import { DatabaseModule } from './database/database.module';
 import { IamModule } from './iam/iam.module';
@@ -10,6 +11,7 @@ import { UsersModule } from './users/users.module';
   imports: [
     ConfigModule.forRoot(),
     DatabaseModule.forRoot(),
+    RedisModule.forRoot(),
     UsersModule,
     IamModule,
   ],
