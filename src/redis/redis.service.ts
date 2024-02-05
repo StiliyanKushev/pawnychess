@@ -19,6 +19,7 @@ export class RedisService
 
   public client: Redis;
 
+  /* istanbul ignore next */
   onApplicationBootstrap() {
     this.client = new Redis({
       host: this.redisConfiguration.host,
@@ -26,6 +27,7 @@ export class RedisService
     });
   }
 
+  /* istanbul ignore next */
   onApplicationShutdown() {
     this.client.quit();
   }

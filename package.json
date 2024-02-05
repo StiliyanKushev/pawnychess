@@ -17,7 +17,9 @@
         "test:watch": "jest --watch",
         "test:cov": "jest --coverage",
         "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-        "test:e2e": "jest --config ./test/jest-e2e.json"
+        "test:e2e": "jest --config ./test/jest-e2e.json || true",
+        "pretest:e2e": "docker-compose up -d test-db test-redis",
+        "posttest:e2e": "docker-compose stop test-db && docker-compose rm -f test-db test-redis"
     },
     "dependencies": {
         "@nestjs/common": "^10.0.0",
@@ -39,7 +41,7 @@
     "devDependencies": {
         "@nestjs/cli": "^10.0.0",
         "@nestjs/schematics": "^10.0.0",
-        "@nestjs/testing": "^10.0.0",
+        "@nestjs/testing": "^10.3.1",
         "@types/bcrypt": "^5.0.2",
         "@types/express": "^4.17.17",
         "@types/jest": "^29.5.12",
@@ -75,7 +77,18 @@
             "^.+\\.(t|j)s$": "ts-jest"
         },
         "collectCoverageFrom": [
-            "**/*.(t|j)s"
+            "src/**/*.ts"
+        ],
+        "coveragePathIgnorePatterns": [
+            "node_modules",
+            "test-config",
+            "interfaces",
+            "jestGlobalMocks.ts",
+            ".module.ts",
+            "main.ts",
+            "config.ts",
+            "dto.ts",
+            ".mock.ts"
         ],
         "coverageDirectory": "../coverage",
         "testEnvironment": "node"

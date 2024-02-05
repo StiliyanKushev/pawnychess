@@ -12,3 +12,15 @@ services:
     restart: always
     ports:
       - '${REDIS_PORT}:6379'
+  test-db:
+    image: postgres
+    restart: always
+    ports:
+      - '5433:5432'
+    environment:
+      - POSTGRES_PASSWORD=pass123
+  test-redis:
+    image: redis
+    restart: always
+    ports:
+      - '6380:6379'
