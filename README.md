@@ -1,3 +1,5 @@
+The project and this readme is under active development. ⚠️
+
 ## Description
 
 This is a backend application written in NestJS for a chess platform, much like lichess.org and alike.
