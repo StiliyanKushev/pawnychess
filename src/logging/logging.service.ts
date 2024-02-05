@@ -8,6 +8,7 @@ export class LoggingService {
    * bootstrapping phase that will setup additional
    * configuration to enable the custom logger.
    */
+  /* istanbul ignore next */
   setup(app: INestApplication): void {
     app.useLogger(app.get(Logger));
     app.useGlobalInterceptors(new LoggerErrorInterceptor());

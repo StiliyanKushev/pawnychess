@@ -15,6 +15,7 @@ export class SwaggerSetupService {
    * bootstrapping phase that will setup additional
    * configuration to enable swagger.
    */
+  /* istanbul ignore next */
   setup(app: INestApplication): void {
     const options = new DocumentBuilder()
       .setTitle(this.swaggerConfiguration.title)
