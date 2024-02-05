@@ -1,6 +1,6 @@
 ## Description
 
-This is a backend application written in NestJS (TODO, list all patterns, features, third-party libraries used) for a chess platform, much like lichess.org and alike.
+This is a backend application written in NestJS for a chess platform, much like lichess.org and alike.
 
 ## Installation
 
