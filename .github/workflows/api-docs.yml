@@ -1,5 +1,7 @@
 name: api docs
 
+permissions: write-all
+
 on:
   push:
     branches:
@@ -19,11 +21,20 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
+        with:
+          # We need to use PAT alongside this
+          # see: https://github.com/orgs/community/discussions/26220
+          persist-credentials: false
 
       - name: Use Node.js 20.x
         uses: actions/setup-node@v2
         with:
           node-version: 20.x
+
+      - name: Configure Git
+        run: |
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+          git config user.name "${{ github.actor }}"
 
       - name: Install Docker and Docker Compose
         run: |
