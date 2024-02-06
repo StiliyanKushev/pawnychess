@@ -66,4 +66,4 @@ jobs:
         run: |
           git add ./API_DOCUMENTATION.md -f
           git commit -m "docs: update"
-          git push https://${{ secrets.PAT }}@github.com/StiliyanKushev/pawnychess.git docs
+          git push https://${{ secrets.PAT }}@github.com/StiliyanKushev/pawnychess.git master
