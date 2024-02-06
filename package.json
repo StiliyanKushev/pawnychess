@@ -6,6 +6,7 @@
     "private": true,
     "license": "UNLICENSED",
     "scripts": {
+        "docker:prepare": "docker-compose up -d db redis",
         "build": "nest build",
         "docs": "nest start --entryFile openapi.js",
         "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",

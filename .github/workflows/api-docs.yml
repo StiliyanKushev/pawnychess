@@ -45,6 +45,9 @@ jobs:
       - name: Prepare .env
         run: cp .env.e2e .env
 
+      - name: Prepare containers
+        run: sudo npm run docker:prepare
+
       - name: Generate the docs markdown
         run: npm run docs
 
