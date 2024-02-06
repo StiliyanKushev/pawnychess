@@ -1,4 +1,4 @@
-name: unit tests
+name: api docs
 
 on:
   push:
@@ -16,21 +16,23 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [16.x, 18.x, 20.x]
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js 20.x
         uses: actions/setup-node@v2
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 20.x
 
       - name: Install Dependencies
         run: npm ci
 
       - name: Run Tests
-        run: npm run test
+        run: npm run docs
+
+      - name: Upload new docs
+        run: |
+          git add ./API_DOCUMENTATION.md -f
+          git commit -m "docs: update"
+          git push
