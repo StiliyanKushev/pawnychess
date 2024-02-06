@@ -31,7 +31,7 @@ jobs:
       - name: Prepare .env
         run: cp .env.e2e .env
 
-      - name: Run Tests
+      - name: Generate the docs markdown
         run: npm run docs
 
       - name: Upload new docs
