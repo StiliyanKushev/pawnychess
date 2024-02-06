@@ -9,6 +9,6 @@ async function bootstrap() {
   const document = app.get(SwaggerSetupService).setup(app);
   const docs = await converter.convert(document, {});
   fs.writeFileSync('./API_DOCUMENTATION.md', docs);
-  process.exit();
+  process.exit(0);
 }
 bootstrap();
