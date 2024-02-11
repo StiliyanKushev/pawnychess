@@ -8,8 +8,10 @@ import {
 import { ConfigType } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
+import { IncomingHttpHeaders } from 'http';
 import jwtConfig from 'iam/config/jwt.config';
 import { IAccessTokenPayload } from 'iam/interfaces/access-token-payload.interface';
+import { Socket } from 'socket.io';
 import { UsersService } from 'users/users.service';
 
 /**
@@ -18,6 +20,16 @@ import { UsersService } from 'users/users.service';
  */
 declare module 'express-serve-static-core' {
   export interface Request {
+    accessToken?: IAccessTokenPayload;
+  }
+}
+
+/**
+ * Make sure to be type friendly and append the user as an
+ * optional property to the ws socket.
+ */
+declare module 'socket.io' {
+  export interface Socket {
     accessToken?: IAccessTokenPayload;
   }
 }
@@ -45,12 +57,40 @@ export class AccessTokenGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    if (context.getType() == 'ws') {
+      return this.handleWsContext(context);
+    } else if (context.getType() == 'http') {
+      return this.handleHttpContext(context);
+    } else {
+      return true;
+    }
+  }
+
+  async canActivateWsClientConnection(client: Socket): Promise<boolean> {
+    try {
+      const token = this.extractTokenFromHeader(client.handshake.headers);
+      client.accessToken = await this.verifyTokenOrFail(token);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  private async handleHttpContext(context: ExecutionContext): Promise<boolean> {
     const ctx = context.switchToHttp();
     const req = ctx.getRequest<Request>();
-    const token = this.extractTokenFromHeader(req);
-    if (!token) {
-      throw new UnauthorizedException();
-    }
+    const token = this.extractTokenFromHeader(req.headers);
+    req.accessToken = await this.verifyTokenOrFail(token);
+    return true;
+  }
+
+  private async handleWsContext(context: ExecutionContext): Promise<boolean> {
+    const ctx = context.switchToWs();
+    const client = ctx.getClient<Socket>();
+    return await this.canActivateWsClientConnection(client);
+  }
+
+  private async verifyTokenOrFail(token: string): Promise<IAccessTokenPayload> {
     try {
       const payload = await this.jwtService.verifyAsync<IAccessTokenPayload>(
         token,
@@ -61,15 +101,17 @@ export class AccessTokenGuard implements CanActivate {
       if (!(await this.userService.hasOne(payload.sub))) {
         throw new UnauthorizedException();
       }
-      req.accessToken = payload;
+      return payload;
     } catch {
       throw new UnauthorizedException();
     }
-    return true;
   }
 
-  private extractTokenFromHeader(request: Request): string | undefined {
-    const [, token] = request.headers.authorization?.split(' ') ?? [];
+  private extractTokenFromHeader(headers: IncomingHttpHeaders): string {
+    const [, token] = headers.authorization?.split(' ') ?? [];
+    if (!token) {
+      throw new UnauthorizedException();
+    }
     return token;
   }
 }
