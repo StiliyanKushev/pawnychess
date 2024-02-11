@@ -67,13 +67,9 @@ export class AccessTokenGuard implements CanActivate {
   }
 
   async canActivateWsClientConnection(client: Socket): Promise<boolean> {
-    try {
-      const token = this.extractTokenFromHeader(client.handshake.headers);
-      client.accessToken = await this.verifyTokenOrFail(token);
-      return true;
-    } catch {
-      return false;
-    }
+    const token = this.extractTokenFromHeader(client.handshake.headers);
+    client.accessToken = await this.verifyTokenOrFail(token);
+    return true;
   }
 
   private async handleHttpContext(context: ExecutionContext): Promise<boolean> {

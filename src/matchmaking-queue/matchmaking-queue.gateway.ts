@@ -20,10 +20,11 @@ export class MatchmakingQueueGateway extends BaseWsGateway {
   }
 
   async handleConnection(client: Socket) {
-    if (!(await this.accessTokenGuard.canActivateWsClientConnection(client))) {
-      client.disconnect(true);
-    } else {
+    try {
+      await this.accessTokenGuard.canActivateWsClientConnection(client);
       super.handleConnection(client);
+    } catch {
+      client.disconnect(true);
     }
   }
 
