@@ -54,7 +54,7 @@ describe('AccessTokenGuard', () => {
     expect(guard).toBeDefined();
   });
 
-  describe('canActivate', () => {
+  describe('canActivate [http]', () => {
     it('should throw UnauthorizedException if token is not provided', async () => {
       const context = createMockExecutionContext('');
       await expect(guard.canActivate(context)).rejects.toThrow(
@@ -86,11 +86,58 @@ describe('AccessTokenGuard', () => {
       await expect(guard.canActivate(context)).resolves.toBe(true);
     });
   });
+
+  describe('canActivate [ws]', () => {
+    it('should throw UnauthorizedException if token is not provided', async () => {
+      const context = createMockExecutionContext('');
+      jest.spyOn(context, 'getType').mockReturnValueOnce('ws');
+      await expect(guard.canActivate(context)).rejects.toThrow(
+        UnauthorizedException,
+      );
+    });
+
+    it('should throw UnauthorizedException if token is invalid', async () => {
+      jest.spyOn(jwtService, 'verifyAsync').mockRejectedValueOnce(new Error());
+      const context = createMockExecutionContext('Bearer invalid_token');
+      jest.spyOn(context, 'getType').mockReturnValueOnce('ws');
+      await expect(guard.canActivate(context)).rejects.toThrow(
+        UnauthorizedException,
+      );
+    });
+
+    it('should throw UnauthorizedException if user does not exist', async () => {
+      jest.spyOn(jwtService, 'verifyAsync').mockResolvedValueOnce(mockPayload);
+      jest.spyOn(userService, 'hasOne').mockResolvedValueOnce(false);
+      const context = createMockExecutionContext('Bearer valid_token');
+      jest.spyOn(context, 'getType').mockReturnValueOnce('ws');
+      await expect(guard.canActivate(context)).rejects.toThrow(
+        UnauthorizedException,
+      );
+    });
+
+    it('should allow access if token is valid and user exists', async () => {
+      jest.spyOn(jwtService, 'verifyAsync').mockResolvedValueOnce(mockPayload);
+      jest.spyOn(userService, 'hasOne').mockResolvedValueOnce(true);
+      const context = createMockExecutionContext('Bearer valid_token');
+      jest.spyOn(context, 'getType').mockReturnValueOnce('ws');
+      await expect(guard.canActivate(context)).resolves.toBe(true);
+    });
+  });
 });
 
 // Utility function to create mock ExecutionContext
 function createMockExecutionContext(authHeader: string): ExecutionContext {
   return {
+    getType: jest.fn().mockReturnValue('http'),
+    switchToWs: () => ({
+      getClient: () => ({
+        handshake: {
+          headers: {
+            authorization: authHeader,
+          },
+        },
+      }),
+    }),
     switchToHttp: () => ({
       getRequest: () => ({
         headers: {
@@ -98,5 +145,5 @@ function createMockExecutionContext(authHeader: string): ExecutionContext {
         },
       }),
     }),
-  } as ExecutionContext;
+  } as unknown as ExecutionContext;
 }

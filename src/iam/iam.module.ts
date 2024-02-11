@@ -47,7 +47,9 @@ import { HashingService } from './hashing/hashing.service';
     AuthenticationService,
     AccessTokenGuard,
     TokensCacheService,
+    AuthenticationGuard,
   ],
   controllers: [AuthenticationController],
+  exports: [AuthenticationGuard, AccessTokenGuard],
 })
 export class IamModule {}
